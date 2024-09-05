@@ -1,8 +1,8 @@
 const URL = 'http://localhost:3000/series'; //Variavel da API 
 const filmeContent = document.querySelector('#titulos'); //Recebe o id titulos 
-
+let valorInicial = 10;
 async function GetApi(pagina, limit) { //Cria a função assincrona para executar a API
-  const data = await fetch(`${URL}?pagina=${pagina}`) //Criar a const para alterar os valores da api
+  const data = await fetch(`${URL}?pagina=${pagina}&limite=${limit}`) //Criar a const para alterar os valores da api
   const dados = await data.json() // muda o recebimento de promise para json
   return dados; //Retorna o json 
 }
@@ -24,7 +24,7 @@ async function renderFilmes(pagina, limit) { //Funçao para carregar a lista de 
     filmeContent.appendChild(div) //determina que div e filho da filmeContent
   });
   {
-    if (pagina - 1 >= 1) { //Inicia a condiçao se a pagina for maior ou igual a 1
+    if (pagina - 1 >= 1) { //Inicia a condiçao se a pagina for maior ou igual a 1 
       let btn = document.createElement('button') //cria o elemento botao 
       btn.textContent = "page anterior"; //nomeia ele como pagina anterior
       filmeContent.appendChild(btn); //denomina botao como filho de filmContent
@@ -44,68 +44,34 @@ async function renderFilmes(pagina, limit) { //Funçao para carregar a lista de 
   }
 }
 
-async function pFilme() {
-  const dados = await GetApi(1, 240) //Consome a função para receber a api
-  dados.data.forEach(element => {
-    let div = document.createElement('div') //cria a div para inserir os filmes
-    div.className = 'divFilmes' //cria a classe divFilmes na div recem criada
-    let titulo = document.createElement('p')   //cria uma paragrafo chamado titulo
-    titulo.textContent = element.titulo //recebe o titulo do elemento o recebimeto do paragrafo
-    let img = document.createElement('img') //Cria o elemento paragrafo
-    img.src = element.imagem; //modifica o src rebendo do elemento o link da imagem do filme
-
-    div.appendChild(titulo) //determina que titulo e filho de div
-    div.appendChild(img) //determina que img e filho de div
-    filmeContent.appendChild(div) //determina que div e filho da filmeContent
-  });
-  return element.data;
-}
-
 async function buscar() {
   const buscar = document.querySelector('#buscar'); //Recebe o id buscar do input
   const search = document.querySelector('#search');
   const pesquisa = search.value
-  console.log(pesquisa);
   const dados = await GetApi(1,240);
   dados.data.forEach(element => {
-    console.log(element.titulo)
-    if(pesquisa === element.titulo){
-      console.log(element.titulo)
+    if(pesquisa.toLowerCase() === element.titulo.toLowerCase()){
+      filmeContent.innerHTML = ""
+      let div = document.createElement('div') //cria a div para inserir os filmes
+      div.className = 'divFilmes' //cria a classe divFilmes na div recem criada
+      let titulo = document.createElement('p')   //cria uma paragrafo chamado titulo
+      titulo.textContent = element.titulo //recebe o titulo do elemento o recebimeto do paragrafo
+      let img = document.createElement('img') //Cria o elemento paragrafo
+      img.src = element.imagem; //modifica o src rebendo do elemento o link da imagem do filme
+
+      div.appendChild(titulo) //determina que titulo e filho de div
+      div.appendChild(img) //determina que img e filho de div
+      filmeContent.appendChild(div) //determina que div e filho da filmeContent
     }
   });
 }
 
-renderFilmes(1, 10);
-
-/*
-function recarregarLista(filmes) {
-  filmeContent.innerHTML = ''; // Clear existing list items
-
-  filmes.forEach(filme => {
-    const li = document.createElement('li');
-    li.classList.add('filme'); // Add your desired class name
-    li.innerHTML = `
-      <h3>${filme.titulo}</h3>
-      <img src="${filme.imagem}" alt="${filme.titulo}">
-      <p>${filme.resumo}</p>
-    `; // Assuming you want to display title, image, and summary
-    filmeContent.appendChild(li);
-  });
+function alterarValor() {
+  const selectElement = document.getElementById('meuSelect');
+  valorInicial = selectElement.value;
+  console.log(`${valorInicial}`);
+  renderFilmes(1,valorInicial);
 }
 
-async function buscarFilmes(pagina = 1, limite = 10) { // Default values for pagination
-  const response = await fetch(`${URL}?pagina=${pagina}&limite=${limite}`);
-  if (!response.ok) {
-    console.error('Error fetching data:', response.statusText);
-    // Optionally display an error message to the user
-    return;
-  }
+renderFilmes(1, valorInicial);
 
-  const data = await response.json();
-  recarregarLista(data.data); // Use data.data for the actual list of films
-}
-
-// Example usage:
-buscarFilmes(); // Fetches the first page (default)
-buscarFilmes(2, 20); // Fetches the second page with a limit of 20 films
-*/
